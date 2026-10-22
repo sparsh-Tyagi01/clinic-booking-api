@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Clinic {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @db.VarChar(150)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  slots Slot[]
+
+  @@map("clinics")
+}
+
+model Slot {
+  id        String   @id @default(uuid()) @db.Uuid
+  clinicId  String   @map("clinic_id") @db.Uuid
+  startsAt  DateTime @map("starts_at") @db.Timestamptz(3)
+  endsAt    DateTime @map("ends_at") @db.Timestamptz(3)
+  status    String   @default("AVAILABLE") @db.VarChar(20)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  clinic    Clinic    @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+  bookings  Booking[]
+
+  @@index([clinicId, startsAt])
+  @@map("slots")
+}
+
+model Booking {
+  id        String   @id @default(uuid()) @db.Uuid
+  slotId    String   @map("slot_id") @db.Uuid
+  patientId String   @map("patient_id") @db.Uuid
+  status    String   @default("CONFIRMED") @db.VarChar(20)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  slot Slot @relation(fields: [slotId], references: [id], onDelete: Restrict)
+
+  @@index([patientId, createdAt])
+  @@map("bookings")
+}
