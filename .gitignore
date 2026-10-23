@@ -1,9 +1,11 @@
-/generated/prisma
+# Python (legacy)
+.venv/
+__pycache__/
 
+# Node
 node_modules/
-dist/
-.env
-.env.*
-!.env.example
-coverage/
-.DS_Store
+
+# Database
+*.db
+*.db-wal
+*.db-shm
